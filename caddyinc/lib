@@ -1,0 +1,56 @@
+##
+## make_website domain_name
+## Quickest way to set your Caddy server up for serving static websites from /www/{domain_name} and
+## storing logs at /logs/{domain_name}
+##
+(lib/make_website) {
+  file_server {
+    root /www/{args.0}
+    hide error/index.html
+  }
+  encode gzip
+  log {
+    output file /logs/{args.0}.log {
+      roll_size 1MiB
+      roll_keep 5
+    }
+  }
+  handle_errors {
+    @404 {
+      expression {http.error.status_code} == 404
+    }
+    handle @404 {
+      rewrite * error/index.html
+      file_server
+    }
+  }
+}
+
+##
+## make_website_with_basic_opts domain_name www_path logs_path
+## This library snippet lets you point to a custom htdoc directory where a directory matching your
+## domain name containing the html files will be served as root. Same thing applies for where the logs
+## should be stored
+##
+(lib/make_website_with_basic_opts) {
+  file_server {
+    root {args.1}/{args.0}
+    hide error/index.html
+  }
+  encode gzip
+  log {
+    output file {args.2}/{args.0}.log {
+      roll_size 1MiB
+      roll_keep 5
+    }
+  }
+  handle_errors {
+    @404 {
+      expression {http.error.status_code} == 404
+    }
+    handle @404 {
+      rewrite * error/index.html
+      file_server
+    }
+  }
+}

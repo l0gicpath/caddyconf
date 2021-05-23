@@ -1,0 +1,13 @@
+import caddyinc/lib
+
+example.org {
+  import lib/make_website_with_basic_opts example.org /etc/htweb /logs/htweb
+}
+
+foobar.example.org {
+  import lib/make_website foobar.example.org
+}
+
+reverseproxy-example.example.org {
+    reverse_proxy localhost:3030
+}
